@@ -15,9 +15,7 @@ function output = BowChain_master(cruise,varargin)
 addpath(genpath('ParseFunctions'));   % instrument parsing functions
 addpath(genpath('ChainModels'));      % bow chain shape models
 addpath(genpath('TimeOffsets'));      % Sensor clock offset computation methods
-addpath(genpath('gsw'));              % GSW toolbox
 addpath(genpath('Hooks'));            % Hook functions
-addpath(genpath('RSKtools'));         % RSK tools
 addpath(genpath(['Cruise_' cruise])); % cruise-specific functions
 
 config = get_config(cruise,varargin{:}); % get processing options
