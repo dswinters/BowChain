@@ -35,10 +35,15 @@ These were mostly done in ~SUNRISE_post_load_hook.m~.
 ** Missing data from keel CTDs 60378 & 60380
 We have one datafile from 60380, but it only contains data from later Aries deployments. I have yet to locate any files from 60378.
 
-- Aries/deploy_20210621: missing keel CTD 60380
-- Aries/deploy_20210622: missing keel CTD 60380
-- Aries/deploy_20210622_2300: missing keel CTD 60378
-- Aries/deploy_20210624: missing keel CTD 60378
-- Polly/deploy_20210623_2225: missing keel CTD 60380
-- Polly/deploy_20210625: missing keel CTD 60380
-- Polly/deploy_20210629: missing keel CTD 60380
+|-------+----------------------+------------------|
+| RHIB  | Deployment           | Missing CTD Data |
+|-------+----------------------+------------------|
+| Aries | deploy_20210621      |            60380 |
+| Aries | deploy_20210622      |            60380 |
+| Aries | deploy_20210622_2300 |            60378 |
+| Aries | deploy_20210624      |            60378 |
+| Aries | deploy_20210706      |            60379 |
+| Polly | deploy_20210623_2225 |            60380 |
+| Polly | deploy_20210625      |            60380 |
+| Polly | deploy_20210629      |            60380 |
+|-------+----------------------+------------------|
