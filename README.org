@@ -1,0 +1,153 @@
+#+TITLE: BowChain
+#+AUTHOR: Dylan Winters
+
+* Overview
+Process a all bow chain deployments from a cruise with
+=BowChain_master(cruiseName)=. Process a specific vessel or deployment with
+=BowChain_master(cruiseName,vesselName,deploymentName)=.
+
+~BowChain_master.m~ is structured as follows:
+
+** Cruise and deployment configuration
+
+The cruise's configuration function is called using [[file:Code/get_config.m][get_config.m]]. This fills
+the cruise's config structure with global default options from
+[[file:Code/config_default.m][config_default.m]] and checks deployments for missing options.
+
+** Deployment processing
+   
+Each deployment is processed sequentially with the following steps:
+
+1) Sensor setup ([[file:Code/preproc_setup.m][preproc_setup.m]])
+   - The user-defined sensor serial numbers are passed into
+     [[file:Code/get_sensor_info.m][get_sensor_info.m]]. This function acts as a database containing
+     processing instructions for different sensor types.
+   - If the instrument type is known and an associated raw datafile is found,
+     the sensor gets an entry in ~config.sensors~ containing parsing
+     instructions and an output .mat file name.
+
+2) File conversion ([[file:Code/preproc_raw2mat.m][preproc_raw2mat.m]])
+
+   - Using the information gathered in [[file:Code/preproc_setup.m][preproc_setup.m]], each sensor's raw
+     datafiles are convered to a .mat format. This step is skipped if .mat
+     files already exist.
+
+3) Load data
+
+   - Each sensor's .mat file is loaded using [[file:Code/proc_load_mat.m][proc_load_mat.m]]. This creates a
+     ~data~ cell array with raw sensor data in each cell.
+
+4) Sample data onto a uniformly-spaced time base using [[file:Code/proc_grid_init.m][proc_grid_init.m]].
+   - This initializes the ~grided~ data structure that is passed through the
+     next several functions.
+   - /If any customizations add additional fields to the ~gridded~ structure,
+     they must be initialized in this function./ MATLAB will throw an error if a
+     function tries to add fields to a single entry of a non-scalar struct
+     array. In other words, ~gridded(i) = some_function(gridded(i))~ will not
+     work if ~some_function~ tries to add non-initialized fields to
+     ~gridded(i)~.
+
+5) Calibrate sensor clocks and pressure sensors
+   - Clocks are calibrated using [[file:Code/proc_time_offsets.m][proc_time_offsets.m]]. The
+     ~config.time_offset_method~ and related fields control what this function
+     does.
+   - Pressure sensors are calibrated with [[file:Code/proc_pressure_cal.m][proc_pressure_cal.m]] if the
+     ~config.zero_pressure_interval~ field is defined.
+   - Time and pressure offsets are applied to the raw data, and it is once again
+     sampled onto a uniformly-spaced time base using [[file:Code/proc_grid_init.m][proc_grid_init.m]].
+
+6) Compute positional offsets with a chain shape model
+   - [[file:Code/proc_chain_model.m][proc_chain_model.m]] uses known instrument positions and measured pressure
+     data to compute positional offsets for each measurement. This fills the ~x~
+     and ~z~ fields of the gridded data structure.
+
+7) Apply positional offsets to GPS data
+   - [[file:Code/proc_gps.m][proc_gps.m]] converts positional offsets to arclength on the WGS84
+     ellipsoid and adds them to the ship's position in the direction of the
+     ship's heading.
+
+* Setup
+
+** BowChain
+
+Clone the git repository:
+
+#+BEGIN_SRC sh
+git clone https://github.com/dswinters/BowChain.git
+#+END_SRC
+
+Copy the ~user_directories.m.example~ file to ~user_directories.m~:
+#+BEGIN_SRC sh
+cd BowChain/Code
+cp user_directories.m.example user_directories.m
+#+END_SRC
+
+** RSKtools
+
+Download RSKtools from [[https://rbr-global.com/support/matlab-tools]] and add it to MATLAB's path (typically somewhere like ~$HOME/Documents/MATLAB~). I do this in ~$HOME/Documents/MATLAB/startup.m~:
+
+#+BEGIN_SRC matlab
+addpath(genpath(fullfile(userpath,'RSKtools')));
+#+END_SRC
+
+
+* Configuration
+
+** Deployment configuration
+
+Within the [[file:Code/][Code]] directory, cruise-specific folders contain information needed to
+locate and process deployment data. Each cruise needs a ~<cruise>_config~ file
+that returns a structure containing configuration information for each
+deployment.
+
+See the [[https://github.com/dswinters/BowChain/blob/SUNRISE_2021/Code/Cruise_SUNRISE/config_SUNRISE.m][config_SUNRISE.m]] in the [[https://github.com/dswinters/BowChain/tree/SUNRISE_2021/Code/Cruise_SUNRISE][SUNRISE_2021 branch]] for an example of a cruise
+configuration file. This function can utilize whatever organizational structure
+exists for a cruise; it just needs to return a ~config~ structure with the
+following options for each deployment:
+
+*** Deployment configuration options
+
+Base parameters
+| Field                         | Description                                      | Default                 |
+|-------------------------------+--------------------------------------------------+-------------------------|
+| config.name                   | deployment name                                  |                         |
+| config.vessel                 | vessel name                                      |                         |
+| config.dir.raw                | raw deployment data directory                    |                         |
+| config.sensor_sn              | cell array of sensor serial number strings       |                         |
+| config.sensor_pos             | vector of sensor positions                       |                         |
+| config.dn_range               | time interval for deployment                     |                         |
+| config.freq_base              | frequency of gridded output data                 | 2 Hz                    |
+| config.time_offset.method     | method for sensor clock corrections              | 'none'                  |
+| config.zero_pressure_interval | time interval for zero-pressure calibration      | no pressure calibration |
+| config.chain_model            | model to use for instrument position corrections | 'cm_straight'           |
+| config.file_gps               | location of GPS data file                        |                         |
+
+Some configuration options require additional fields in the ~config~ structure:
+| Field                     | Value         | Additional Required Field | Description                                 |
+|---------------------------+---------------+---------------------------+---------------------------------------------|
+| config.time_offset_method | 'cohere'      | config.cohere_interval    | Interval to use for clock calibration       |
+| config.time_offset_method | 'known_drift' | config.time_synched       | Time (datenum,UTC) that clocks were synched |
+| config.time_offset_method | 'known_drift' | config.drift              | Measured clock drift on recovery            |
+ 
+
+** Instrument configuration
+
+Each instrument is linked to an instrument type via its serial number, and each
+instrument type is linked to a parsing function and a raw data file extension.
+This is all done in [[file:Code/get_sensor_info.m][get_sensor_info.m]], which takes a serial number as input.
+
+*Any instruments that I have not encountered will not be included in this list!*
+Fortunately, associating serial numbers to instruments can be easily done by
+modifying [[file:Code/get_sensor_info.m][get_sensor_info]] to include new serial numbers.
+
+Every sensor parsing function is wrapped in a simple function to rename the
+fields in a consistent manner. The following files in the [[file:Code/ParseFunctions/][Code/ParseFunctions/]]
+directory are all examples of such "wrapper" functions:
+
+- [[file:Code/ParseFunctions/parse_rbr_concerto.m]]
+- [[file:Code/ParseFunctions/parse_rbr_solo.m]]
+- [[file:Code/ParseFunctions/parse_sbe39.m]]
+- [[file:Code/ParseFunctions/parse_sbe56.m]]
+
+See the latter half of [[file:Code/get_sensor_info.m][get_sensor_info.m]] for associations between instrument
+types and parsing functions.
