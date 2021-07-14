@@ -140,6 +140,9 @@ for i = 1:length(config)
           case 'deploy_20210702'
             config(i).zero_pressure_interval = datenum(['02-Jul-2021 00:57:36';
                                                         '02-Jul-2021 14:45:16']);
+          case 'deploy_20210706'
+            config(i).zero_pressure_interval = datenum(['06-Jul-2021 21:24:42';
+                                                        '06-Jul-2021 22:45:38']);
         end
 
       case 'Polly'
