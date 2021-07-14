@@ -1,0 +1,15 @@
+% MODIFY THIS AND COPY TO user_directories.m
+% User-specific directores. Use this file as a template for defining paths to
+% your cruise data.
+function d = user_directories(cruise)
+
+switch cruise
+  case 'ArcticMix'
+    d = fullfile(getenv('DATA'), 'BowChain/Arctic_bowchain/RawData/');
+  case 'ASIRI_2015'
+    d = fullfile(getenv('DATA'), 'BowChain/ASIRI_2015/raw/');
+  case 'CANAPE'
+    d = fullfile(getenv('DATA'), 'OSU_Thermistors/');
+  case 'InnerShelf'
+    d = fullfile(getenv('HOME'), 'Work/BowChain/private/Data/innerShelf/bow_chain/');
+end
