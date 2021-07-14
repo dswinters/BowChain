@@ -1,0 +1,39 @@
+#+TITLE: SUNRISE TChain Processing Notes
+
+* Manually Applied Corrections
+These were mostly done in ~SUNRISE_post_load_hook.m~.
+
+** Walton_Smith/deploy_20210623_2235
+- RBR Solo 100154 did not log and was ignored
+- RBR Solo 101168 was manually masked for the later half of the deployment
+
+** Walton_Smith/deploy_20210627
+- RBR Solo 101154's clock was manually corrected using the config screenshot
+- RBR Solo 101168 did not log and was ignored
+
+** Walton_Smith/deploy_20210630_2045
+- RBR Solo 101154's clock was manually corrected using the config screenshot
+
+** Polly/deploy_20210625
+- RBR Solo 207057's clock was manually corrected using the config screenshot
+- RBR Solo 101179 did not log and was ignored
+
+* Outstanding issues
+** Aries/deploy_20210622
+- Missing data from the lower Concerto (60088). There is some data in the .rsk file, but it appears to be from an earlier test deployment.
+
+** Aries/deploy_20210629
+- Concerto 60702 started behaving oddly mid-deployment. Strange timestamps and pressure values. Possibly salvageable for the 1st half of the deployment.
+- Missing data from RBR Solo 101192
+
+
+** Missing data from keel CTDs 60378 & 60380
+We have one datafile from 60380, but it only contains data from later Aries deployments. I have yet to locate any files from 60378.
+
+- Aries/deploy_20210621: missing keel CTD 60380
+- Aries/deploy_20210622: missing keel CTD 60380
+- Aries/deploy_20210622_2300: missing keel CTD 60378
+- Aries/deploy_20210624: missing keel CTD 60378
+- Polly/deploy_20210623_2225: missing keel CTD 60380
+- Polly/deploy_20210625: missing keel CTD 60380
+- Polly/deploy_20210629: missing keel CTD 60380
