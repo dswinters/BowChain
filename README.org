@@ -1,6 +1,8 @@
 #+TITLE: BowChain
 #+AUTHOR: Dylan Winters
 
+[[file:banner.png]]
+
 * Overview
 Process a all bow chain deployments from a cruise with
 =BowChain_master(cruiseName)=. Process a specific vessel or deployment with
