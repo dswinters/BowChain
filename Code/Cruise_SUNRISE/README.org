@@ -1,5 +1,10 @@
 #+TITLE: SUNRISE TChain Processing Notes
 
+* Description
+This is the code that I (Dylan Winters) used to process the BowChain/Tchain data from the Walton Smith and the two RHIBs Aries and Polly. The only adjustments needed to run this should be to things like directory names.
+
+~proc_tchain_all.m~ looks through raw deployment folders, saves .mat files for processed deployments, and chops deployments up into survey sections. The other ~.m~ files contained here are for the main BowChain code (i.e. running ~BowChain_master('SUNRISE')~).
+
 * Manually Applied Corrections
 These were mostly done in ~SUNRISE_post_load_hook.m~.
 
