@@ -165,6 +165,9 @@ for i = 1:length(config)
                                                         '03-Jul-2021 22:26:32']);
         end
 
+      case 'Pelican'
+        config(i).file_gps = '/home/dw/Data/SUNRISE/PE_nav_final.mat';
+
       % Configure Pelican deployments
       case 'Pelican'
         switch config(i).name

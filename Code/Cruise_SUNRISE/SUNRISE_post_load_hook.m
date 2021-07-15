@@ -75,7 +75,19 @@ switch cfg.vessel
         %                 max(cellfun(@(c) c.dn(end),data))];
     end
 
-  case 'deploy_20210704';
-    keyboard
+  case 'Pelican'
+    switch cfg.name
+      case 'deploy_20210706'
+        % Concerto 60183 has some bad timestamps mid-deployment.. skip for now
+        % to avoid making a time vector to year 2073
+        rm = strcmp({cfg.sensors.sn},'60183');
+        data = data(~rm);
+        cfg.sensors = cfg.sensors(~rm);
+
+        % Fix start/end times temporarily
+        cfg.dn_range = [min(cellfun(@(c) c.dn(1),data)),...
+                        max(cellfun(@(c) c.dn(end),data))];
+
+    end
 
 end
