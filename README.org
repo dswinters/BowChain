@@ -1,7 +1,72 @@
-#+TITLE: BowChain
+#+TITLE: BowChain [SUNRISE 2021 Branch]
 #+AUTHOR: Dylan Winters
 
 [[file:banner.png]]
+
+* SUNRISE 2021 Notes
+** Links to Files (access to shared Google Drive required)
+
+|-----------------------+-------+---------+-------+--------------|
+| Format                | Aries | Pelican | Polly | Walton Smith |
+|-----------------------+-------+---------+-------+--------------|
+| Raw Data (.rsk)       | [[https://drive.google.com/drive/folders/1T8OOWNxaBcAnjby5LED0wHfiGiaP4IB8?usp=sharing][Link]]  | [[https://drive.google.com/drive/folders/1FZw4GSGXDE3jZt5EK3esQksPPxXyWuo3?usp=sharing][Link]]    | [[https://drive.google.com/drive/folders/1SpyaHECoPTCD1tkVMyeFq8EDyUNtwrag?usp=sharing][Link]]  | [[https://drive.google.com/drive/folders/1SNvqGYEspDUJOPIE07eqHj7Pelk_2A3v?usp=sharing][Link]]         |
+| Raw Data (.mat)       | [[https://drive.google.com/drive/folders/1672JXZlFSxFF6LTwrC9rnHw4K8XSigxd?usp=sharing][Link]]  | [[https://drive.google.com/drive/folders/1FZw4GSGXDE3jZt5EK3esQksPPxXyWuo3?usp=sharing][Link]]    | [[https://drive.google.com/drive/folders/162U_QZyp7c_gbhqoBFHxfgg3U2C9EQ0N?usp=sharing][Link]]  | [[https://drive.google.com/drive/folders/1TDgVUwYWTyzat0Ylpn-HJxg8zAj5d34a?usp=sharing][Link]]         |
+| Deployment .mat files | [[https://drive.google.com/drive/folders/1g37D9Cuv5h8wv4jpGIexu3_JLK6ikijD?usp=sharing][Link]]  | [[https://drive.google.com/drive/folders/18L3IIR9l-H_vT6NpFwObz90p-dGyX_yJ?usp=sharing][Link]]    | [[https://drive.google.com/drive/folders/1g37D9Cuv5h8wv4jpGIexu3_JLK6ikijD?usp=sharing][Link]]  | [[https://drive.google.com/drive/folders/1g37D9Cuv5h8wv4jpGIexu3_JLK6ikijD?usp=sharing][Link]]         |
+| Section .mat files    | [[https://drive.google.com/drive/folders/1TCm5d2ihl97T3w-1K_nm-5oUL0QYTcNG?usp=sharing][Link]]  | TODO    | [[https://drive.google.com/drive/folders/1TCm5d2ihl97T3w-1K_nm-5oUL0QYTcNG?usp=sharing][Link]]  | [[https://drive.google.com/drive/folders/1TCm5d2ihl97T3w-1K_nm-5oUL0QYTcNG?usp=sharing][Link]]         |
+|-----------------------+-------+---------+-------+--------------|
+
+*** Descriptions
+- *Raw data (.rsk)*: Post-deployment data straight from sensors.
+- *Raw data (.mat)*: Unmodified raw data, converted to .mat format with a consistent structure.
+
+  |------------+---------------+------------------------|
+  | Field Name | Description   | Units                  |
+  |------------+---------------+------------------------|
+  | c          | conductivity  | S/m                    |
+  | dn         | datenum       | days from Jan 1 year 1 |
+  | p          | pressure      | dBar                   |
+  | s          | salinity      | PSU                    |
+  | sn         | serial number | --                     |
+  | t          | temperature   | C                      |
+
+- *Deployment .mat files*: Full-deployment (i.e. chain in water) files with all sensors re-sampled to a regular time grid.
+
+  - Pressure offsets have been removed.
+  - Severe clock offsets have been corrected, but clocks have not been corrected for drift.
+  - Temperatures have not been calibrated.
+  - Depths were computed by interpolating pressure to along-chain position.
+
+  |------------+------+-----------------------------+---------------|
+  | Field Name | Size | Description                 | Units         |
+  |------------+------+-----------------------------+---------------|
+  | dn         | 1xT  | datenum                     | days          |
+  | info       | --   | processing settings         | --            |
+  | lat        | 1xT  | latitude                    | deg N         |
+  | lon        | 1xT  | longitude                   | deg E         |
+  | p          | NxT  | pressure, NaN if not logged | dBar          |
+  | pos        | Nx1  | along-chain position        | m             |
+  | s          | NxT  | salinity, NaN if not logged | PSU           |
+  | t          | NxT  | temperature                 | C             |
+  | z          | NxT  | depth coordinate            | m (0=surface) |
+  |------------+------+-----------------------------+---------------|
+  #+CAPTION: N=number of sensors; T=number of samples.
+
+- *Section .mat files*: Same as above, but separated into individual sections.
+
+** Outstanding Issues
+
+See [[file:Code/Cruise_SUNRISE/README.org][SUNRISE Tchain Processing Notes]] for additional notes on manually applied corrections.
+
+*** TODO Integrate Pelican processing code into this repository
+*** TODO Timestamp corrections
+- [X] Sensors with severe clock issues (e.g. wrong timezone, clock at year 0) have been corrected in the processed data.
+- [ ] Clocks have not been corrected for drift during the cruise. Once this is done, data can be easily re-processed.
+  - [ ] Need to identify time of initial UTC sync and compute drift for every sensor (using screenshots in raw data folders)
+
+*** TODO Temperature calibrations
+- No modifications have been made to measured temperatures except in some extreme cases where bad data was masked with NaNs.
+
+
 
 * Overview
 Process a all bow chain deployments from a cruise with
