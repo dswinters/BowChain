@@ -49,7 +49,7 @@
   | t          | NxT  | temperature                 | C             |
   | z          | NxT  | depth coordinate            | m (0=surface) |
   |------------+------+-----------------------------+---------------|
-  #+CAPTION: N=number of sensors; T=number of samples.
+  N=number of sensors; T=number of samples.
 
 - *Section .mat files*: Same as above, but separated into individual sections.
 
